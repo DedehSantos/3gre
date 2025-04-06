@@ -29,7 +29,7 @@ include_once "./conexao/conexao.php";
     <div class="dropdown-menu">
       <a class="dropdown-item" href="./entrada/planilha_entrada.php" target="_blank">BAIXAR RELATÓRIO</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="./entrada/quantidadeAlunos.php" target="_blank">PRESENTES NA 3GRE</a>
+      <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">PRESENTES NA 3GRE</a>
       <div class="dropdown-divider"></div>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/cadastrar_usuario.php" target="_blank">CADASTRAR USUARIO</a>
@@ -73,23 +73,7 @@ include_once "./conexao/conexao.php";
         var segundos = dataAtual.getSeconds().toString().padStart(2, '0'); // Formata segundos para 2 dígitos
         var horarioAtual = horas + ":" + minutos + ":" + segundos; // Cria o horário atual no formato HH:MM:SS
 
-        // Verifica se o horário atual é igual ou maior que o horário definido
-        if (horarioAtual >= horarioInicio) {
-            console.log("Horário atingido. Chamando faltas.php...");
-
-            // Faz uma requisição AJAX para o arquivo faltas.php
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", "./entrada/faltas.php", true);
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    console.log("Requisição completada. Redirecionando para index.php...");
-                    // Redireciona para a página index.php após a requisição
-                    window.location.href = "index.php";
-                }
-            };
-            xhr.send(); // Envia a requisição
-        }
-    }
+   
 
     // Chama a função em um intervalo de 1 segundo (1000 ms)
     setInterval(verificarHorario, 30000);

@@ -1,141 +1,125 @@
 <?php
-// Inclui o arquivo de conexão com o banco de dados
 include_once "../conexao/conexao.php";
+date_default_timezone_set('America/Sao_Paulo');
+$data_hoje = date("d/m/Y");
 
-// Obtém a data e hora atual no fuso horário de São Paulo
-$timeZone = new \DateTimeZone('America/Sao_Paulo');
-$dataAtual = new \DateTime();
-$dataAtual->setTimezone($timeZone);
-$data_hoje = $dataAtual->format('Y-m-d'); // Formato para comparação no banco
-$hora_atual = $dataAtual->format('H:i:s');
+$matricula_pesquisa = $_GET['matricula'] ?? '';
+$nome_pesquisa = $_GET['nome'] ?? '';
+$setor_pesquisa = $_GET['setor'] ?? '';
 
-// Inicializa variáveis para os filtros de pesquisa
-$matricula_pesquisa = isset($_GET['matricula']) ? $_GET['matricula'] : '';
-$nome_pesquisa = isset($_GET['nome']) ? $_GET['nome'] : '';
-$setor_pesquisa = isset($_GET['setor']) ? $_GET['setor'] : '';
-
-// Consulta para listar todos os funcionários
-$sql_funcionarios = "SELECT matricula, nome, setor FROM registros_de_pontos WHERE 1=1";
-
+// Consulta todos os usuários
+$sql = "SELECT matricula, nome, setor FROM usuarios_3gre WHERE 1=1";
 if (!empty($matricula_pesquisa)) {
-    $sql_funcionarios .= " AND matricula LIKE '%$matricula_pesquisa%'";
+    $sql .= " AND matricula LIKE '%$matricula_pesquisa%'";
 }
 if (!empty($nome_pesquisa)) {
-    $sql_funcionarios .= " AND nome LIKE '%$nome_pesquisa%'";
+    $sql .= " AND nome LIKE '%$nome_pesquisa%'";
 }
 if (!empty($setor_pesquisa)) {
-    $sql_funcionarios .= " AND setor = '$setor_pesquisa'";
+    $sql .= " AND setor = '$setor_pesquisa'";
 }
+$result = $conn->query($sql);
+$funcionarios = [];
 
-$result_funcionarios = mysqli_query($conn, $sql_funcionarios);
+while ($row = $result->fetch_assoc()) {
+    $matricula = $row['matricula'];
+    $nome = $row['nome'];
+    $setor = $row['setor'];
 
-if (mysqli_num_rows($result_funcionarios) > 0) {
-    $funcionarios_comparados = [];
+    // Busca registro de ponto para hoje
+    $stmt = $conn->prepare("SELECT hora_entrada, hora_saida FROM registros_de_pontos WHERE matricula = ? AND data = ?");
+    $stmt->bind_param("ss", $matricula, $data_hoje);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    $tem_registro = $res->num_rows > 0;
 
-    while ($funcionario = mysqli_fetch_assoc($result_funcionarios)) {
-        $matricula = $funcionario['matricula'];
-        $nome = $funcionario['nome'];
-        $setor = $funcionario['setor'];
+    $hora_entrada = '--';
+    $hora_saida = '--';
+    $horas_trabalhadas = '--';
+    $status = 'Ausente';
+    $classe = 'ausente';
 
-        $status = 'Aguardando';
-        $classStatus = 'aguardando';
+    if ($tem_registro) {
+        $registro = $res->fetch_assoc();
+        $hora_entrada = $registro['hora_entrada'] ?? '--';
+        $hora_saida = $registro['hora_saida'] ?? '--';
 
-        // Verifica se o funcionário tem registro de entrada na data de hoje
-        $sql_entrada = "SELECT * FROM registros_de_pontos WHERE matricula = ? AND 'data_entrada' = ?";
-        $stmt_entrada = $conn->prepare($sql_entrada);
-        $stmt_entrada->bind_param("ss", $matricula, $data_hoje);
-        $stmt_entrada->execute();
-        $stmt_entrada->store_result();
-
-        // Verifica se há registro de atraso
-        $sql_atraso = "SELECT * FROM registros_atraso WHERE matricula = ? AND data_atraso = ?";
-        $stmt_atraso = $conn->prepare($sql_atraso);
-        $stmt_atraso->bind_param("ss", $matricula, $data_hoje);
-        $stmt_atraso->execute();
-        $stmt_atraso->store_result();
-
-        if ($stmt_entrada->num_rows > 0) {
-            $status = 'Presente';
-            $classStatus = 'presente';
+        if ($hora_entrada !== '--' && $hora_saida !== '--') {
+            $entrada = strtotime($hora_entrada);
+            $saida = strtotime($hora_saida);
+            $segundos = max($saida - $entrada, 0);
+            $horas_trabalhadas = sprintf('%02d:%02d', floor($segundos / 3600), ($segundos % 3600) / 60);
         }
 
-        if ($stmt_atraso->num_rows > 0) {
-            $status = 'Atrasado';
-            $classStatus = 'atrasado';
-        }
-
-        // Verifica se há registro de saída
-        $sql_saida = "SELECT * FROM registros_saida WHERE matricula = ? AND data_saida = ?";
-        $stmt_saida = $conn->prepare($sql_saida);
-        $stmt_saida->bind_param("ss", $matricula, $data_hoje);
-        $stmt_saida->execute();
-        $stmt_saida->store_result();
-
-        if ($stmt_saida->num_rows > 0) {
-            $status = 'Saiu';
-            $classStatus = 'saiu';
-        }
-
-        $funcionarios_comparados[] = [
-            'matricula' => $matricula,
-            'nome' => $nome,
-            'setor' => $setor,
-            'status' => $status,
-            'data' => $data_hoje,
-            'classStatus' => $classStatus
-        ];
-
-        $stmt_entrada->close();
-        $stmt_atraso->close();
-        $stmt_saida->close();
+        $status = 'Presente';
+        $classe = 'presente';
     }
-    ?>
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Status dos Funcionários - <?php echo $data_hoje; ?></title>
-        <link rel="stylesheet" href="../css/bootstrap.min.css">
-        <style>
-            .aguardando { background-color: #808080; }
-            .presente { background-color: #007f00; color: white; }
-            .atrasado { background-color: #FFFF00; }
-            .saiu { background-color: #0000FF; color: white; }
-        </style>
-    </head>
-    <body>
-        <div class="container mt-5">
-            <h2>Status dos Funcionários - <?php echo $data_hoje; ?></h2>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Matrícula</th>
-                        <th>Nome</th>
-                        <th>Setor</th>
-                        <th>Status</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($funcionarios_comparados as $funcionario): ?>
-                        <tr class="<?php echo $funcionario['classStatus']; ?>">
-                            <td><?php echo $funcionario['matricula']; ?></td>
-                            <td><?php echo $funcionario['nome']; ?></td>
-                            <td><?php echo $funcionario['setor']; ?></td>
-                            <td><?php echo $funcionario['status']; ?></td>
-                            <td><?php echo $funcionario['data']; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </body>
-    </html>
-    <?php
-} else {
-    echo "Nenhum funcionário encontrado.";
+
+    $funcionarios[] = [
+        'matricula' => $matricula,
+        'nome' => $nome,
+        'setor' => $setor,
+        'hora_entrada' => $hora_entrada,
+        'hora_saida' => $hora_saida,
+        'horas_trabalhadas' => $horas_trabalhadas,
+        'status' => $status,
+        'data' => $data_hoje,
+        'classStatus' => $classe
+    ];
+
+    $stmt->close();
 }
 
-mysqli_close($conn);
+$conn->close();
 ?>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Status dos Funcionários - <?= date('d/m/Y', strtotime($data_hoje)) ?></title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <style>
+        .presente { background-color: #28a745; color: white; }
+        .ausente { background-color: #e0e0e0; color: black; }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Status dos Funcionários - <?= date('d/m/Y', strtotime($data_hoje)) ?></h2>
+
+    <?php if (!empty($funcionarios)): ?>
+        <table class="table table-bordered mt-3">
+            <thead class="thead-light">
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Nome</th>
+                    <th>Setor</th>
+                    <th>Hora Entrada</th>
+                    <th>Hora Saída</th>
+                    <th>Horas Trabalhadas</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($funcionarios as $f): ?>
+                    <tr class="<?= $f['classStatus'] ?>">
+                        <td><?= htmlspecialchars($f['matricula']) ?></td>
+                        <td><?= htmlspecialchars($f['nome']) ?></td>
+                        <td><?= htmlspecialchars($f['setor']) ?></td>
+                        <td><?= $f['hora_entrada'] ?></td>
+                        <td><?= $f['hora_saida'] ?></td>
+                        <td><?= $f['horas_trabalhadas'] ?></td>
+                        <td><?= $f['status'] ?></td>
+                        <td><?= date('d/m/Y', strtotime($f['data'])) ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <div class="alert alert-info mt-4">Nenhum funcionário encontrado.</div>
+    <?php endif; ?>
+</div>
+</body>
+</html>

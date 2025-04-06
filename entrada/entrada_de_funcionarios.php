@@ -166,18 +166,35 @@ $conn->close();
             max-width: 600px;
             margin: 50px auto;
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 30px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
         }
-        .progress {
-            height: 30px;
-        }
+
         h2 {
             color: #007bff;
+            font-weight: bold;
+            margin-bottom: 25px;
         }
+
         .info {
             font-size: 18px;
+            margin: 5px 0;
+        }
+
+        .nome-destaque {
+            font-size: 24px;
+            font-weight: bold;
+            color: #343a40;
+            background: #e9ecef;
+            border-left: 6px solid #007bff;
+            padding: 10px 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+        }
+
+        .progress {
+            height: 30px;
         }
     </style>
 </head>
@@ -185,7 +202,9 @@ $conn->close();
 
 <div class="container text-center">
     <h2>Resumo da Jornada</h2>
-    <p class="info"><strong>Nome:</strong> <?= htmlspecialchars($nome); ?></p>
+
+    <div class="nome-destaque"><?= htmlspecialchars($nome); ?></div>
+
     <p class="info"><strong>Data:</strong> <?= date("d/m/Y"); ?></p>
     <p class="info"><strong>Entrada:</strong> <?= $hora_entrada; ?> | <strong>Saída:</strong> <?= $hora_saida; ?></p>
     <p class="info"><strong>Início da Jornada:</strong> <?= $inicio_jornada; ?> | <strong>Fim:</strong> <?= $final_jornada; ?></p>
@@ -215,3 +234,8 @@ $conn->close();
 <script src="../js/bootstrap.min.js"></script>
 </body>
 </html>
+<script>
+    setTimeout(function() {
+        window.location.href = "../index.php";
+    }, 8000); // 8000 milissegundos = 8 segundos
+</script>

@@ -73,7 +73,7 @@
 <body>
 
   <div class="topbar">
-    <h4>PHP CRUD GENERATOR</h4>
+    <h4>CADASTRAR USUARIOS</h4>
     <div>
       <span class="me-3"><i class="fa-solid fa-user"></i> Admin</span>
     </div>
