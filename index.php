@@ -27,7 +27,7 @@ include_once "./conexao/conexao.php";
       MENU PRINCIPAL
     </button>
     <div class="dropdown-menu">
-      <a class="dropdown-item" href="./entrada/planilha_entrada.php" target="_blank">BAIXAR RELATÓRIO</a>
+      <a class="dropdown-item" href="./entrada/gerar_planilha.php" target="_blank">BAIXAR RELATÓRIO</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">PRESENTES NA 3GRE</a>
       <div class="dropdown-divider"></div>
@@ -58,26 +58,75 @@ include_once "./conexao/conexao.php";
     </div>
   </div>
 
-  <h1 id="mensagem" style="display:none;"></h1> <!-- Título que será exibido -->
 
-  <!-- Script para verificar o horário e fazer a requisição -->
+
   <script>
-    // Define o horário em que a ação deve ocorrer (exemplo: 15:00:00)
-    var horarioInicio = "17:00:00";
+  const input = document.getElementById('busca');
 
-    // Função para comparar o horário atual com o horário definido e chamar faltas.php
-    function verificarHorario() {
-        var dataAtual = new Date(); // Obtém a data e hora atuais
-        var horas = dataAtual.getHours().toString().padStart(2, '0'); // Formata horas para 2 dígitos
-        var minutos = dataAtual.getMinutes().toString().padStart(2, '0'); // Formata minutos para 2 dígitos
-        var segundos = dataAtual.getSeconds().toString().padStart(2, '0'); // Formata segundos para 2 dígitos
-        var horarioAtual = horas + ":" + minutos + ":" + segundos; // Cria o horário atual no formato HH:MM:SS
+  // Foco no campo ao carregar a página
+  window.onload = function () {
+    input.focus();
+  };
 
-   
-
-    // Chama a função em um intervalo de 1 segundo (1000 ms)
-    setInterval(verificarHorario, 30000);
+  // Mantém o foco constante no campo
+  setInterval(function () {
+    input.focus();
+  }, 100);
 </script>
+
+<!-- Mensagens de feedback -->
+<h1 id="mensagem" style="display:none;" class="text-center mt-4"></h1>
+<div id="feedback" class="alert alert-success text-center" style="display:none;"></div>
+
+<!-- Script de execução de faltas.php ao atingir o horário definido -->
+<script>
+  const horarioInicio = "17:00:00"; // Defina o horário desejado aqui
+  let faltasChamadas = false; // Garante que só será chamado uma vez
+
+  // Verifica se é um dia útil
+  function diaUtil() {
+    const hoje = new Date().getDay(); // 0 = Domingo, 6 = Sábado
+    return hoje >= 1 && hoje <= 5;
+  }
+
+  function verificarHorario() {
+    if (!diaUtil() || faltasChamadas) return;
+
+    const agora = new Date();
+    const horarioAtual = agora.toTimeString().slice(0, 8); // HH:MM:SS
+
+    if (horarioAtual >= horarioInicio) {
+      console.log("Horário atingido! Chamando faltas.php...");
+
+      // Faz a chamada para faltas.php
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "./entrada/faltas.php", true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          console.log("Faltas registradas com sucesso.");
+          window.location.href = "index.php";
+        }
+      };
+      xhr.send();
+
+      faltasChamadas = true; // Evita múltiplas chamadas
+    }
+  }
+
+  // Verifica o horário a cada segundo
+  setInterval(verificarHorario, 1000);
+</script>
+
+
+
+
+
+
+
+
+
+
+
 
 </body>
 

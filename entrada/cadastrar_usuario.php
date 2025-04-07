@@ -106,18 +106,18 @@
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="nome" class="form-label">Nome Completo</label>
-              <input type="text" class="form-control" name="nome" id="nome" required placeholder="Digite seu nome completo">
+              <input type="text" class="form-control" name="nome" id="nome" required placeholder="Digite seu nome completo" require>
             </div>
             <div class="col-md-6">
               <label for="matricula" class="form-label">Matrícula</label>
-              <input type="number" class="form-control" name="matricula" id="matricula" required placeholder="Digite sua matrícula">
+              <input type="number" class="form-control" name="matricula" id="matricula" required placeholder="Digite sua matrícula" require>
             </div>
           </div>
 
           <div class="row mb-3">
             <div class="col-md-6">
               <label for="setor" class="form-label">Setor</label>
-              <input type="text" class="form-control" name="setor" id="setor" required placeholder="Digite seu setor">
+              <input type="text" class="form-control" name="setor" id="setor" required placeholder="Digite seu setor" require>
             </div>
             <div class="col-md-6">
               <label for="email" class="form-label">Email</label>

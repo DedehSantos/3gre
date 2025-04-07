@@ -7,7 +7,6 @@ $matricula_pesquisa = $_GET['matricula'] ?? '';
 $nome_pesquisa = $_GET['nome'] ?? '';
 $setor_pesquisa = $_GET['setor'] ?? '';
 
-// Consulta todos os usuários
 $sql = "SELECT matricula, nome, setor FROM usuarios_3gre WHERE 1=1";
 if (!empty($matricula_pesquisa)) {
     $sql .= " AND matricula LIKE '%$matricula_pesquisa%'";
@@ -26,34 +25,43 @@ while ($row = $result->fetch_assoc()) {
     $nome = $row['nome'];
     $setor = $row['setor'];
 
-    // Busca registro de ponto para hoje
     $stmt = $conn->prepare("SELECT hora_entrada, hora_saida FROM registros_de_pontos WHERE matricula = ? AND data = ?");
     $stmt->bind_param("ss", $matricula, $data_hoje);
     $stmt->execute();
     $res = $stmt->get_result();
-    $tem_registro = $res->num_rows > 0;
 
     $hora_entrada = '--';
     $hora_saida = '--';
     $horas_trabalhadas = '--';
     $status = 'Ausente';
-    $classe = 'ausente';
+    $classe = 'cinza';
 
-    if ($tem_registro) {
+    if ($res->num_rows > 0) {
         $registro = $res->fetch_assoc();
         $hora_entrada = $registro['hora_entrada'] ?? '--';
         $hora_saida = $registro['hora_saida'] ?? '--';
-
-        if ($hora_entrada !== '--' && $hora_saida !== '--') {
+    
+        // Se a hora_entrada for 00:00:00, trata como ausência
+        if ($hora_entrada === '00:00:00') {
+            $hora_entrada = '--';
+            $hora_saida = '--';
+            $horas_trabalhadas = '--';
+            $classe = 'cinza';
+            $status = 'Ausente';
+        } elseif ($hora_entrada !== '--' && $hora_saida !== '--' && $hora_saida !== '00:00:00') {
             $entrada = strtotime($hora_entrada);
             $saida = strtotime($hora_saida);
             $segundos = max($saida - $entrada, 0);
             $horas_trabalhadas = sprintf('%02d:%02d', floor($segundos / 3600), ($segundos % 3600) / 60);
+            $classe = 'amarelo';
+            $status = 'Presente (Entrada e Saída)';
+        } elseif ($hora_entrada !== '--') {
+            $classe = 'verde';
+            $status = 'Presente (Apenas Entrada)';
         }
-
-        $status = 'Presente';
-        $classe = 'presente';
     }
+    
+    
 
     $funcionarios[] = [
         'matricula' => $matricula,
@@ -80,8 +88,9 @@ $conn->close();
     <title>Status dos Funcionários - <?= date('d/m/Y', strtotime($data_hoje)) ?></title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <style>
-        .presente { background-color: #28a745; color: white; }
-        .ausente { background-color: #e0e0e0; color: black; }
+        .verde { background-color: #28a745; color: white; }    /* Apenas entrada */
+        .amarelo { background-color: #ffc107; color: black; }  /* Entrada e saída */
+        .cinza { background-color: #e0e0e0; color: black; }     /* Nenhum registro */
     </style>
 </head>
 <body>
