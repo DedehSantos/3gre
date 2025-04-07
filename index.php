@@ -34,7 +34,7 @@ include_once "./conexao/conexao.php";
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/cadastrar_usuario.php" target="_blank">CADASTRAR USUARIO</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="./entrada/faltasdiarias.php" target="_blank">FALTAS</a>
+      <a class="dropdown-item" href="./entrada/quantidade_de_funcionarios.php" target="_blank"> RELATORIO EM TEMPO REAL </a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="botoes.php" target="_blank">SETORES</a>
       <div class="dropdown-divider"></div>
