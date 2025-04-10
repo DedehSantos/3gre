@@ -120,8 +120,8 @@
               <input type="text" class="form-control" name="setor" id="setor" required placeholder="Digite seu setor" require>
             </div>
             <div class="col-md-6">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" id="email" required placeholder="exemplo@dominio.com">
+              <label for="funcao" class="form-label">Função</label>
+              <input type="text" class="form-control" name="funcao" id="funcao" required placeholder="Digite a Funçao">
             </div>
           </div>
 

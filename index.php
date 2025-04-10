@@ -32,7 +32,7 @@ include_once "./conexao/conexao.php";
     <div class="dropdown-menu">
       <a class="dropdown-item" href="./entrada/gerar_planilha.php" target="_blank">BAIXAR RELATÓRIO</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">QUANTIDADE NA GRE HOJE</a>
+      <a class="dropdown-item" href="./entrada/quantidade.php" target="_blank">QUANTIDADE NA GRE HOJE</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">PRESENTES NA 3GRE</a>
       <div class="dropdown-divider"></div>
