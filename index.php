@@ -22,15 +22,19 @@ include_once "./conexao/conexao.php";
 </head>
 
 <body>
-  <div class="btn-group">
+   <div class="container">
+
+   
+  <div class="btn-group ">
     <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       MENU PRINCIPAL
     </button>
     <div class="dropdown-menu">
       <a class="dropdown-item" href="./entrada/gerar_planilha.php" target="_blank">BAIXAR RELATÓRIO</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">PRESENTES NA 3GRE</a>
+      <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">QUANTIDADE NA GRE HOJE</a>
       <div class="dropdown-divider"></div>
+      <a class="dropdown-item" href="./entrada/no_local.php" target="_blank">PRESENTES NA 3GRE</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/cadastrar_usuario.php" target="_blank">CADASTRAR USUARIO</a>
       <div class="dropdown-divider"></div>
@@ -38,7 +42,7 @@ include_once "./conexao/conexao.php";
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="botoes.php" target="_blank">SETORES</a>
       <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="entrada/atestadoejustificativa.php" target="_blank">ATESTADOS/JUSTIFICATIVA</a>
+      <a class="dropdown-item" href="./justificativa" target="_blank">ATESTADOS/JUSTIFICATIVA</a>
       <div class="dropdown-divider"></div>
       <a class="dropdown-item" href="./entrada/configuracoes.php" target="_blank">CONFIGURAÇÕES</a>
       <div class="dropdown-divider"></div>
@@ -58,7 +62,7 @@ include_once "./conexao/conexao.php";
     </div>
   </div>
 
-
+  </div>
 
   <script>
   const input = document.getElementById('busca');
