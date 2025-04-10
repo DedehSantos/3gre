@@ -24,10 +24,15 @@ $html .= '<td><b>Setor</b></td>';
 $html .= '<td><b>Data</b></td>';
 $html .= '<td><b>Hora Entrada</b></td>';
 $html .= '<td><b>Hora Saída</b></td>';
+$html .= '<td><b>Horas Trabalhadas</b></td>';
+$html .= '<td><b>horas extras</b></td>';
+$html .= '<td><b>Percentual da Jornada</b></td>';
+$html .= '<td><b>Faltas</b></td>';
+$html .= '<td><b>Justificativa</b></td>';
 $html .= '</tr>';
 
 // Consulta os registros
-$sql = "SELECT id, matricula, nome, setor, data, hora_entrada, hora_saida FROM registros_de_pontos ORDER BY data DESC";
+$sql = "SELECT id, matricula, nome, setor, data, hora_entrada, hora_saida, horas_trabalhadas, hora_extra, percentual_jornada, faltas, justificado, justificativa FROM registros_de_pontos ORDER BY data DESC";
 $result = mysqli_query($conn, $sql);
 
 while ($row = mysqli_fetch_assoc($result)) {
@@ -39,6 +44,11 @@ while ($row = mysqli_fetch_assoc($result)) {
     $html .= '<td>' . date('d/m/Y', strtotime($row["data"])) . '</td>';
     $html .= '<td>' . $row["hora_entrada"] . '</td>';
     $html .= '<td>' . $row["hora_saida"] . '</td>';
+    $html .= '<td>' . $row["horas_trabalhadas"] . '</td>';
+    $html .= '<td>' . $row["hora_extra"] . '</td>';
+    $html .= '<td>' . $row["percentual_jornada"] . '</td>';
+    $html .= '<td>' . $row["faltas"] . '</td>';
+    $html .= '<td>' . $row["justificativa"] . '</td>';
     $html .= '</tr>';
 }
 

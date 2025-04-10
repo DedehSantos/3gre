@@ -79,24 +79,6 @@
     </div>
   </div>
 
-  <div class="sidebar">
-    <h5>FILTROS</h5>
-    <div class="mb-3">
-      <label for="filtro1" class="form-label">Nome</label>
-      <input type="text" class="form-control" id="filtro1" placeholder="Buscar por nome">
-    </div>
-    <div class="mb-3">
-      <label for="filtro2" class="form-label">Setor</label>
-      <select class="form-select" id="filtro2">
-        <option selected>Todos</option>
-        <option>RH</option>
-        <option>TI</option>
-        <option>Financeiro</option>
-      </select>
-    </div>
-    <button class="btn btn-warning w-100 mb-2">Resetar</button>
-    <button class="btn btn-info w-100">Filtrar</button>
-  </div>
 
   <div class="content">
     <div class="container">
